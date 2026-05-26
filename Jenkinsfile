@@ -1,12 +1,6 @@
 pipeline {
     agent any
 
-    parameters {
-        string(name: 'PETCLINIC_REPO_URL', description: 'SSH URL of the petclinic-rest repository')
-        string(name: 'PETCLINIC_BRANCH', defaultValue: 'main', description: 'Branch to checkout')
-        string(name: 'PETCLINIC_CREDENTIALS_ID', description: 'Jenkins credentials ID for SSH access to the repository')
-    }
-
     stages {
         stage('Checkout petclinic-rest') {
             steps {
