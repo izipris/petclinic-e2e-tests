@@ -28,7 +28,7 @@ pipeline {
 
         stage('Run tests') {
             steps {
-                sh './mvnw test'
+                sh './mvnw test -Dspring.profiles.active=ManagedDocker'
             }
         }
     }
