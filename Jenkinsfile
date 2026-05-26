@@ -23,6 +23,19 @@ pipeline {
         stage('Start services') {
             steps {
                 sh './pet-clinic-rest.sh up'
+                sh '''
+                    echo "Waiting for petclinic-rest to be ready..."
+                    for i in $(seq 1 60); do
+                      if curl -sf http://docker:9966/petclinic/actuator/health > /dev/null 2>&1; then
+                        echo "petclinic-rest is ready"
+                        exit 0
+                      fi
+                      sleep 2
+                    done
+                    echo "petclinic-rest failed to become ready after 120s"
+                    docker logs petclinic-app || true
+                    exit 1
+                '''
             }
         }
 
