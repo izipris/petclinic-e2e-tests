@@ -3,6 +3,21 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 APP_DIR="$SCRIPT_DIR/spring-petclinic-rest"
+PETCLINIC_URL="${PETCLINIC_URL:-http://localhost:9966/petclinic}"
+
+wait_for_ready() {
+  echo "Waiting for petclinic-rest to be ready..."
+  for i in $(seq 1 60); do
+    if curl -sf "$PETCLINIC_URL/actuator/health" > /dev/null 2>&1; then
+      echo "petclinic-rest is ready"
+      return 0
+    fi
+    sleep 2
+  done
+  echo "petclinic-rest failed to become ready after 120s"
+  docker logs petclinic-app || true
+  return 1
+}
 
 up() {
   echo "Starting dependencies..."
@@ -25,7 +40,9 @@ up() {
     eclipse-temurin:21-jre-alpine \
     java -jar /app/app.jar
 
-  echo "Petclinic REST is running at http://localhost:9966/petclinic"
+  wait_for_ready
+
+  echo "Petclinic REST is running at $PETCLINIC_URL"
 }
 
 down() {
